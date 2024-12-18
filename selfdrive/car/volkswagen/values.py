@@ -48,7 +48,6 @@ class CarControllerParams:
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
       self.STEER_DELTA_UP = 6             # Max HCA reached in 1.00s (STEER_MAX / (50Hz * 1.00))
       self.STEER_DELTA_DOWN = 10          # Min HCA reached in 0.60s (STEER_MAX / (50Hz * 0.60))
-      self.BTN_STEP = 2
 
       if CP.transmissionType == TransmissionType.automatic:
         self.shifter_values = can_define.dv["Getriebe_1"]["Waehlhebelposition__Getriebe_1_"]
@@ -76,9 +75,9 @@ class CarControllerParams:
       self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
       self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
-      self.STEER_DELTA_UP = 4             # Max HCA reached in 1.50s (STEER_MAX / (50Hz * 1.50))
-      self.STEER_DELTA_DOWN = 10          # Min HCA reached in 0.60s (STEER_MAX / (50Hz * 0.60))
-      self.BTN_STEP = 3
+      self.STEER_MAX = 512
+      self.STEER_DELTA_UP = 10
+      self.STEER_DELTA_DOWN = 10
 
       if CP.transmissionType == TransmissionType.automatic:
         self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
@@ -142,21 +141,6 @@ class VolkswagenFlags(IntFlag):
   PQ = 2
 
 
-class VolkswagenFlagsSP(IntFlag):
-  SP_CC_ONLY = 1
-  SP_CC_ONLY_NO_RADAR = 2
-
-
-BUTTON_STATES = {
-  "accelCruise": False,
-  "decelCruise": False,
-  "cancel": False,
-  "setCruise": False,
-  "resumeCruise": False,
-  "gapAdjustCruise": False
-}
-
-
 @dataclass
 class VolkswagenMQBPlatformConfig(PlatformConfig):
   dbc_dict: DbcDict = field(default_factory=lambda: dbc_dict('vw_mqb_2010', None))
@@ -172,6 +156,11 @@ class VolkswagenPQPlatformConfig(VolkswagenMQBPlatformConfig):
 
   def init(self):
     self.flags |= VolkswagenFlags.PQ
+
+
+@dataclass
+class VolkswagenMQBEvoPlatformConfig(VolkswagenMQBPlatformConfig):
+  dbc_dict: DbcDict = field(default_factory=lambda: dbc_dict('vw_mqbevo', None))
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -283,6 +272,14 @@ class CAR(Platforms):
       VWCarDocs("Volkswagen Golf SportsVan 2015-20"),
     ],
     VolkswagenCarSpecs(mass=1397, wheelbase=2.62),
+    chassis_codes={"5G", "AU", "BA", "BE"},
+    wmis={WMI.VOLKSWAGEN_MEXICO_CAR, WMI.VOLKSWAGEN_EUROPE_CAR},
+  )
+  VOLKSWAGEN_GOLF_MK8 = VolkswagenMQBEvoPlatformConfig(
+    [
+      VWCarDocs("Volkswagen Golf 2021-24"),
+    ],
+    VolkswagenCarSpecs(mass=1409, wheelbase=2.63),
     chassis_codes={"5G", "AU", "BA", "BE"},
     wmis={WMI.VOLKSWAGEN_MEXICO_CAR, WMI.VOLKSWAGEN_EUROPE_CAR},
   )
