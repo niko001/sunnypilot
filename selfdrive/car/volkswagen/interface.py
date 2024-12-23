@@ -52,22 +52,28 @@ class CarInterface(CarInterfaceBase):
     else:
       # Set global MQB parameters
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagen)]
-      ret.enableBsm = 0x30F in fingerprint[0]  # SWA_01
+      #ret.enableBsm = 0x30F in fingerprint[0]  # SWA_01
+      # TODO: locate BSM message
+      ret.enableBsm = False
 
-      if 0xAD in fingerprint[0] or docs:  # Getriebe_11
-        ret.transmissionType = TransmissionType.automatic
-      elif 0x187 in fingerprint[0]:  # EV_Gearshift
-        ret.transmissionType = TransmissionType.direct
-      else:
-        ret.transmissionType = TransmissionType.manual
+      #if 0xAD in fingerprint[0] or docs:  # Getriebe_11
+      #  ret.transmissionType = TransmissionType.automatic
+      #elif 0x187 in fingerprint[0]:  # EV_Gearshift
+      #  ret.transmissionType = TransmissionType.direct
+      #else:
+      #  ret.transmissionType = TransmissionType.manual
+      # TODO: locate gear position message
+      ret.transmissionType = TransmissionType.automatic
 
-      if any(msg in fingerprint[1] for msg in (0x40, 0x86, 0xB2, 0xFD)):  # Airbag_01, LWI_01, ESP_19, ESP_21
-        ret.networkLocation = NetworkLocation.gateway
-      else:
-        ret.networkLocation = NetworkLocation.fwdCamera
+      #if any(msg in fingerprint[1] for msg in (0x40, 0x86, 0xB2, 0xFD)):  # Airbag_01, LWI_01, ESP_19, ESP_21
+      #  ret.networkLocation = NetworkLocation.gateway
+      #else:
+      #  ret.networkLocation = NetworkLocation.fwdCamera
+      # TODO: gateway harness not yet developed
+      ret.networkLocation = NetworkLocation.fwdCamera
 
-      if 0x126 in fingerprint[2]:  # HCA_01
-        ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
+      #if 0x126 in fingerprint[2]:  # HCA_01
+      #  ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
     # Global lateral tuning defaults, can be overridden per-vehicle
 
@@ -76,12 +82,14 @@ class CarInterface(CarInterfaceBase):
       ret.steerActuatorDelay = 0.2
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
     else:
-      ret.steerActuatorDelay = 0.1
+      ret.steerActuatorDelay = 0.15
+      ret.steerLimitTimer = 1.0
+      ret.steerRatio = 15.6  # Let the params learner figure this out
       ret.lateralTuning.pid.kpBP = [0.]
       ret.lateralTuning.pid.kiBP = [0.]
       ret.lateralTuning.pid.kf = 0.00006
-      ret.lateralTuning.pid.kpV = [0.6]
-      ret.lateralTuning.pid.kiV = [0.2]
+      ret.lateralTuning.pid.kpV = [0.8]
+      ret.lateralTuning.pid.kiV = [0.3]
 
     # Global longitudinal tuning defaults, can be overridden per-vehicle
 
