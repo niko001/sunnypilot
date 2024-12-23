@@ -57,7 +57,7 @@ class CarState(CarStateBase):
     ret.steeringRateDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradw_Geschw"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradw_Geschw"])]
     ret.steeringTorque = pt_cp.vl["LH_EPS_03"]["EPS_Lenkmoment"] * (1, -1)[int(pt_cp.vl["LH_EPS_03"]["EPS_VZ_Lenkmoment"])]
     ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
-    ret.yawRate = pt_cp.vl["ESP_02"]["ESP_Gierrate"] * (1, -1)[int(pt_cp.vl["ESP_02"]["ESP_VZ_Gierrate"])] * CV.DEG_TO_RAD
+    ret.yawRate = pt_cp.vl["ESP_NEW_2"]["YAW_RATE"] * (1, -1)[int(pt_cp.vl["ESP_NEW_2"]["YAW_RATE_SIGN"])] * CV.DEG_TO_RAD
     #hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
     #ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status)
 
@@ -75,7 +75,7 @@ class CarState(CarStateBase):
     #ret.brakePressed = brake_pedal_pressed or brake_pressure_detected
     ret.brakePressed = brake_pedal_pressed  # FIXME
     ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
-    ret.brakeLightsDEPRECATED = bool(pt_cp.vl["ESP_05"]['ESP_Status_Bremsdruck'])
+    #ret.brakeLightsDEPRECATED = bool(pt_cp.vl["ESP_05"]['ESP_Status_Bremsdruck'])
 
     # Update gear and/or clutch position data.
     #if trans_type == TransmissionType.automatic:
